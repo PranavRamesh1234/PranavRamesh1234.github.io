@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "export": "next build",
+    "deploy": "npm run export && touch dist/.nojekyll && gh-pages -d dist -t true"
   },
   "dependencies": {
     "@firebase/auth": "^1.10.1",
