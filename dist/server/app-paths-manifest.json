@@ -1,0 +1,17 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/auth/callback/route": "app/auth/callback/route.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/auth/reset-password/page": "app/auth/reset-password/page.js",
+  "/books/[id]/edit/page": "app/books/[id]/edit/page.js",
+  "/books/page": "app/books/page.js",
+  "/books/my-listings/page": "app/books/my-listings/page.js",
+  "/profile/[id]/page": "app/profile/[id]/page.js",
+  "/profile/complete/page": "app/profile/complete/page.js",
+  "/profile/page": "app/profile/page.js",
+  "/profile/edit/page": "app/profile/edit/page.js",
+  "/page": "app/page.js",
+  "/sell/page": "app/sell/page.js",
+  "/auth/page": "app/auth/page.js",
+  "/books/[id]/page": "app/books/[id]/page.js"
+}

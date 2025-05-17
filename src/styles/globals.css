@@ -1,0 +1,327 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base theme styles */
+:root {
+  /* Base colors */
+  --color-primary: #000000;
+  --color-secondary: #D4AF37;
+  --color-accent-pink: #D72660;
+  --color-accent-purple: #3A0CA3;
+  --color-accent-1: #2C3E50;
+  --color-accent-2: #34495E;
+  --color-accent-3: #7F8C8D;
+  
+  /* Rainbow gradient */
+  --color-rainbow: linear-gradient(270deg, #D72660, #F9A825, #43AA8B, #4361EE, #7209B7, #D72660);
+  /* Pink, purple, red, yellow, green, blue, purple, pink */
+  
+  /* Text colors */
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #D4AF37;
+  --color-text-muted: #95A5A6;
+  
+  /* Background colors */
+  --color-bg-primary: #1a0025;
+  --color-bg-secondary: #2d0036;
+  --color-bg-tertiary: #3A0CA3;
+  
+  /* Border colors */
+  --color-border: #3A0CA3;
+  --color-border-light: #D72660;
+  
+  /* Accent colors (muted) */
+  --color-accent-green: #43AA8B;
+  --color-accent-blue: #4361EE;
+  --color-accent-red: #D72660;
+  --color-accent-yellow: #F9A825;
+}
+
+.dark {
+  --color-bg-primary: #1a0025;
+  --color-bg-secondary: #2d0036;
+  --color-bg-tertiary: #3A0CA3;
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #D72660;
+  --color-text-muted: #95A5A6;
+  --color-border: #3A0CA3;
+  --color-border-light: #D72660;
+}
+
+.light {
+  --color-bg-primary: #FFFFFF;
+  --color-bg-secondary: #F5F5F5;
+  --color-bg-tertiary: #F9A825;
+  --color-text-primary: #000000;
+  --color-text-secondary: #D72660;
+  --color-text-muted: #666666;
+  --color-border: #E0E0E0;
+  --color-border-light: #D72660;
+}
+
+body {
+  @apply bg-[var(--color-bg-primary)] text-[var(--color-text-primary)] transition-colors duration-300;
+}
+
+/* Rainbow border animation */
+@keyframes rainbow-border {
+  0% {
+    border-image-source: linear-gradient(0deg, #D72660, #F9A825, #43AA8B, #4361EE, #7209B7, #D72660);
+  }
+  100% {
+    border-image-source: linear-gradient(360deg, #D72660, #F9A825, #43AA8B, #4361EE, #7209B7, #D72660);
+  }
+}
+
+.rainbow-border-animated {
+  border-width: 3px;
+  border-style: solid;
+  border-radius: 1rem;
+  border-image: var(--color-rainbow) 1;
+  animation: rainbow-border 1.2s linear forwards;
+}
+
+.rainbow-border {
+  border-width: 3px;
+  border-style: solid;
+  border-radius: 1rem;
+  border-image: var(--color-rainbow) 1;
+}
+
+/* Glass effects */
+.glass {
+  @apply bg-white/10 backdrop-blur-md border border-white/20;
+}
+
+.glass-card {
+  @apply bg-[var(--color-bg-secondary)]/80 backdrop-blur-md border border-[var(--color-border)] shadow-lg;
+}
+
+.glass-card-pink {
+  @apply bg-[var(--color-accent-pink)]/20 border-[var(--color-accent-pink)] shadow-lg;
+}
+
+.glass-card-purple {
+  @apply bg-[var(--color-accent-purple)]/20 border-[var(--color-accent-purple)] shadow-lg;
+}
+
+.glass-card:hover, .glass-card-pink:hover, .glass-card-purple:hover {
+  @apply transform -translate-y-1 shadow-xl;
+}
+
+/* Card styles */
+.slider-card {
+  @apply bg-[var(--color-bg-secondary)]/95 backdrop-blur-md border border-[var(--color-border)] shadow-lg rounded-lg overflow-hidden transition-all duration-300;
+  position: relative;
+}
+
+.slider-card:hover {
+  /* Rainbow border animation on hover */
+  z-index: 1;
+}
+
+.slider-card.rainbow-animate:hover::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 1rem;
+  pointer-events: none;
+  border: 3px solid transparent;
+  background: conic-gradient(
+    #D72660, #F9A825, #43AA8B, #4361EE, #7209B7, #D72660
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: border-spin 1.2s linear 1;
+}
+
+@keyframes border-spin {
+  0% {
+    transform: rotate(0deg);
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Button styles */
+.btn-primary {
+  @apply bg-[var(--color-accent-pink)] text-[var(--color-text-primary)] hover:bg-[var(--color-accent-purple)] transition-colors duration-300;
+}
+
+.btn-secondary {
+  @apply bg-[var(--color-accent-purple)] text-[var(--color-text-primary)] hover:bg-[var(--color-accent-pink)] transition-colors duration-300;
+}
+
+.glass-button {
+  @apply bg-[var(--color-secondary)]/90 hover:bg-[var(--color-accent-pink)] text-[var(--color-text-primary)] backdrop-blur-sm border border-[var(--color-border-light)] shadow-lg transition-all duration-300;
+}
+
+/* Navbar styles */
+.navbar-glass {
+  @apply bg-[var(--color-bg-primary)]/95 backdrop-blur-md border-b border-[var(--color-border)] shadow-lg;
+}
+
+/* Text styles */
+.gradient-text {
+  @apply bg-gradient-to-r from-[var(--color-accent-pink)] via-[var(--color-accent-purple)] to-[var(--color-secondary)] bg-clip-text text-transparent;
+}
+
+/* Smooth theme transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
+/* Frosted glass effect */
+.frosted-glass {
+  @apply bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50;
+}
+
+/* Enhanced glass card */
+.glass-card {
+  @apply bg-[var(--color-bg-secondary)]/80 backdrop-blur-md border border-[var(--color-border)] shadow-lg;
+}
+
+.glass-card:hover {
+  @apply transform -translate-y-1 shadow-xl border-[var(--color-secondary)]/30;
+}
+
+/* Card hover effects */
+.card-hover {
+  @apply transition-all duration-300 hover:shadow-lg hover:scale-[1.02] hover:bg-white/90 dark:hover:bg-gray-800/90;
+}
+
+/* Button hover effects */
+.button-hover {
+  @apply transition-all duration-300 hover:shadow-md active:scale-95;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  @apply w-2;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-[var(--color-bg-secondary)];
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-[var(--color-secondary)]/50 rounded-full hover:bg-[var(--color-secondary)]/70 transition-colors duration-300;
+}
+
+/* Page transitions */
+.page-transition-enter {
+  @apply opacity-0;
+}
+
+.page-transition-enter-active {
+  @apply opacity-100 transition-opacity duration-300;
+}
+
+.page-transition-exit {
+  @apply opacity-100;
+}
+
+.page-transition-exit-active {
+  @apply opacity-0 transition-opacity duration-300;
+}
+
+/* Loading spinner */
+.loading-spinner {
+  @apply border-[var(--color-secondary)] border-t-transparent;
+}
+
+/* Gradient background */
+.gradient-bg {
+  @apply bg-gradient-to-br from-[var(--color-bg-primary)] via-[var(--color-bg-secondary)] to-[var(--color-bg-tertiary)];
+}
+
+/* Status badges */
+.status-badge {
+  @apply px-2 py-1 rounded-full text-xs font-medium;
+}
+
+.status-badge.available {
+  @apply bg-[var(--color-accent-green)]/20 text-[var(--color-accent-green)];
+}
+
+.status-badge.sold {
+  @apply bg-[var(--color-accent-red)]/20 text-[var(--color-accent-red)];
+}
+
+.status-badge.pending {
+  @apply bg-[var(--color-accent-yellow)]/20 text-[var(--color-accent-yellow)];
+}
+
+/* Form elements */
+input, textarea, select {
+  @apply bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-[var(--color-text-primary)] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-secondary)] focus:border-transparent;
+}
+
+/* Links */
+a {
+  @apply text-[var(--color-secondary)] hover:text-[var(--color-secondary)]/80 transition-colors duration-300;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  @apply text-[var(--color-text-primary)];
+}
+
+/* Dividers */
+hr {
+  @apply border-[var(--color-border)];
+}
+
+/* Code blocks */
+pre, code {
+  @apply bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] rounded-md;
+}
+
+/* Tables */
+table {
+  @apply border-collapse w-full;
+}
+
+th, td {
+  @apply border border-[var(--color-border)] p-2;
+}
+
+th {
+  @apply bg-[var(--color-bg-secondary)];
+}
+
+/* Cards */
+.card {
+  @apply bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg shadow-lg;
+}
+
+/* Alerts */
+.alert {
+  @apply p-4 rounded-lg border;
+}
+
+.alert-success {
+  @apply bg-[var(--color-accent-green)]/20 border-[var(--color-accent-green)] text-[var(--color-accent-green)];
+}
+
+.alert-error {
+  @apply bg-[var(--color-accent-red)]/20 border-[var(--color-accent-red)] text-[var(--color-accent-red)];
+}
+
+.alert-warning {
+  @apply bg-[var(--color-accent-yellow)]/20 border-[var(--color-accent-yellow)] text-[var(--color-accent-yellow)];
+}
+
+.alert-info {
+  @apply bg-[var(--color-accent-blue)]/20 border-[var(--color-accent-blue)] text-[var(--color-accent-blue)];
+} 
