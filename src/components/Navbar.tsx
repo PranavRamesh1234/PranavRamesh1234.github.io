@@ -11,29 +11,30 @@ const navigation = [
   { name: 'Home', href: '/' },
   { name: 'Books', href: '/books' },
   { name: 'Sell', href: '/sell' },
+  { name: 'Requests', href: '/requests' },
 ];
 
 export default function Navbar() {
   const { user, signOut } = useAuth();
 
   return (
-    <Disclosure as="nav" className="bg-gray-900/95 dark:bg-gray-950/90 backdrop-blur-md shadow-lg sticky top-0 z-50">
+    <Disclosure as="nav" className="bg-slate-950/50 backdrop-blur-md shadow-lg sticky top-0 z-50">
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="flex h-16 justify-between">
+            <div className="flex h-16 justify-between items-center">
               <div className="flex">
                 <div className="flex flex-shrink-0 items-center">
-                  <Link href="/" className="text-xl font-bold text-white">
-                    BookMarket
+                  <Link href="/" className="text-xl font-bold text-slate-200">
+                    BookMart
                   </Link>
                 </div>
-                <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+                <div className="hidden sm:ml-10 sm:flex sm:space-x-8">
                   {navigation.map((item) => (
                     <Link
                       key={item.name}
                       href={item.href}
-                      className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-300 hover:text-white transition-colors duration-300"
+                      className="inline-flex items-center px-1 pt-1 text-sm font-medium text-slate-300 hover:text-slate-100 transition-colors duration-300"
                     >
                       {item.name}
                     </Link>
@@ -45,7 +46,7 @@ export default function Navbar() {
                 {user ? (
                   <Menu as="div" className="relative ml-3">
                     <div>
-                      <Menu.Button className="flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300">
+                      <Menu.Button className="flex rounded-full bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300">
                         <span className="sr-only">Open user menu</span>
                         {user.avatar_url ? (
                           <Image
@@ -57,7 +58,7 @@ export default function Navbar() {
                           />
                         ) : (
                           <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white">
-                            {user.full_name.charAt(0)}
+                            {user.full_name.charAt(0) || user.email.charAt(0)}
                           </div>
                         )}
                       </Menu.Button>
@@ -72,14 +73,14 @@ export default function Navbar() {
                       leaveFrom="transform opacity-100 scale-100"
                       leaveTo="transform opacity-0 scale-95"
                     >
-                      <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-gray-800/95 backdrop-blur-md py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                      <div className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-slate-900/95 backdrop-blur-md py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                         <Menu.Item>
                           {({ active }) => (
                             <Link
                               href="/profile"
                               className={`${
-                                active ? 'bg-gray-700/80' : ''
-                              } block px-4 py-2 text-sm text-gray-300 transition-colors duration-300`}
+                                active ? 'bg-slate-800' : ''
+                              } block px-4 py-2 text-sm text-slate-200`}
                             >
                               Your Profile
                             </Link>
@@ -90,10 +91,22 @@ export default function Navbar() {
                             <Link
                               href="/books/my-listings"
                               className={`${
-                                active ? 'bg-gray-700/80' : ''
-                              } block px-4 py-2 text-sm text-gray-300 transition-colors duration-300`}
+                                active ? 'bg-slate-800' : ''
+                              } block px-4 py-2 text-sm text-slate-200`}
                             >
                               My Listings
+                            </Link>
+                          )}
+                        </Menu.Item>
+                        <Menu.Item>
+                          {({ active }) => (
+                            <Link
+                              href="/my-requests"
+                              className={`${
+                                active ? 'bg-slate-800' : ''
+                              } block px-4 py-2 text-sm text-slate-200`}
+                            >
+                              My Requests
                             </Link>
                           )}
                         </Menu.Item>
@@ -102,14 +115,14 @@ export default function Navbar() {
                             <button
                               onClick={() => signOut()}
                               className={`${
-                                active ? 'bg-gray-700/80' : ''
-                              } block w-full text-left px-4 py-2 text-sm text-gray-300 transition-colors duration-300`}
+                                active ? 'bg-slate-800' : ''
+                              } block w-full text-left px-4 py-2 text-sm text-slate-200`}
                             >
                               Sign out
                             </button>
                           )}
                         </Menu.Item>
-                      </Menu.Items>
+                      </div>
                     </Transition>
                   </Menu>
                 ) : (
@@ -124,14 +137,14 @@ export default function Navbar() {
                 )}
               </div>
               <div className="-mr-2 flex items-center sm:hidden">
-                <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white transition-colors duration-300">
+                <button className="inline-flex items-center justify-center rounded-md p-2 text-slate-300 hover:bg-slate-800 hover:text-slate-100 transition-colors duration-300">
                   <span className="sr-only">Open main menu</span>
                   {open ? (
                     <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
                   ) : (
                     <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
                   )}
-                </Disclosure.Button>
+                </button>
               </div>
             </div>
           </div>
@@ -139,18 +152,17 @@ export default function Navbar() {
           <Disclosure.Panel className="sm:hidden">
             <div className="space-y-1 pb-3 pt-2">
               {navigation.map((item) => (
-                <Disclosure.Button
+                <Link
                   key={item.name}
-                  as={Link}
                   href={item.href}
-                  className="block py-2 pl-3 pr-4 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-300"
+                  className="block py-2 pl-3 pr-4 text-base font-medium text-slate-300 hover:bg-slate-800 hover:text-slate-100 transition-colors duration-300"
                 >
                   {item.name}
-                </Disclosure.Button>
+                </Link>
               ))}
             </div>
             {user ? (
-              <div className="border-t border-gray-700 pb-3 pt-4">
+              <div className="border-t border-slate-800 pb-3 pt-4">
                 <div className="flex items-center px-4">
                   {user.avatar_url ? (
                     <Image
@@ -166,40 +178,43 @@ export default function Navbar() {
                     </div>
                   )}
                   <div className="ml-3">
-                    <div className="text-base font-medium text-white">
+                    <div className="text-base font-medium text-slate-200">
                       {user.full_name}
                     </div>
-                    <div className="text-sm font-medium text-gray-400">
+                    <div className="text-sm font-medium text-slate-400">
                       {user.email}
                     </div>
                   </div>
                 </div>
                 <div className="mt-3 space-y-1">
-                  <Disclosure.Button
-                    as={Link}
+                  <Link
                     href="/profile"
-                    className="block px-4 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white transition-colors duration-300"
+                    className="block px-4 py-2 text-base font-medium text-slate-300 hover:bg-slate-800 hover:text-slate-100 transition-colors duration-300"
                   >
                     Your Profile
-                  </Disclosure.Button>
-                  <Disclosure.Button
-                    as={Link}
+                  </Link>
+                  <Link
                     href="/books/my-listings"
-                    className="block px-4 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white transition-colors duration-300"
+                    className="block px-4 py-2 text-base font-medium text-slate-300 hover:bg-slate-800 hover:text-slate-100 transition-colors duration-300"
                   >
                     My Listings
-                  </Disclosure.Button>
-                  <Disclosure.Button
-                    as="button"
+                  </Link>
+                  <Link
+                    href="/my-requests"
+                    className="block px-4 py-2 text-base font-medium text-slate-300 hover:bg-slate-800 hover:text-slate-100 transition-colors duration-300"
+                  >
+                    My Requests
+                  </Link>
+                  <button
                     onClick={() => signOut()}
-                    className="block w-full text-left px-4 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white transition-colors duration-300"
+                    className="block w-full text-left px-4 py-2 text-base font-medium text-slate-300 hover:bg-slate-800 hover:text-slate-100 transition-colors duration-300"
                   >
                     Sign out
-                  </Disclosure.Button>
+                  </button>
                 </div>
               </div>
             ) : (
-              <div className="border-t border-gray-700 pb-3 pt-4">
+              <div className="border-t border-slate-800 pb-3 pt-4">
                 <div className="flex items-center px-4">
                   <Link
                     href="/auth"

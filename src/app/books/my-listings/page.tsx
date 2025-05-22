@@ -126,7 +126,10 @@ export default function MyListingsPage() {
                   <p className="text-sm text-gray-500 dark:text-gray-400">{book.author}</p>
                   <div className="mt-2 flex items-center justify-between">
                     <span className="text-lg font-medium text-blue-600 dark:text-blue-400">
-                      ₹{book.price}
+                      {book.price_type === 'price-on-call' || book.price === null ? 'Price on Call' : `₹${book.price}`}
+                      {book.price_type === 'negotiable' && book.price_type !== 'price-on-call' && (
+                        <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">(Negotiable)</span>
+                      )}
                     </span>
                     <span
                       className={`px-2 py-1 text-xs font-medium rounded-full ${

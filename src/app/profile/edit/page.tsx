@@ -2,16 +2,45 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
+import PhoneNumberInput from '@/components/PhoneNumberInput';
+import dynamic from 'next/dynamic';
+import LocationDetector from '@/components/LocationDetector';
+
+// Dynamically import LocationPicker to avoid SSR issues with Leaflet
+const LocationPicker = dynamic(
+  () => import('@/components/LocationPicker').then(mod => mod.default),
+  {
+    ssr: false,
+    loading: () => <div className="h-[400px] bg-gray-100 dark:bg-gray-800 animate-pulse rounded-lg" />
+  }
+);
+
+interface Coordinates {
+  lat: number;
+  lng: number;
+}
+
+interface LocationData {
+  lat: number;
+  lng: number;
+  address: string;
+}
 
 export default function EditProfilePage() {
-  const { user, updateProfile } = useAuth();
   const router = useRouter();
-  const [fullName, setFullName] = useState(user?.full_name || '');
-  const [phoneNumber, setPhoneNumber] = useState(user?.phone_number || '');
+  const { user, updateProfile: updateUserProfile } = useAuth();
+  const [fullName, setFullName] = useState<string>(user?.full_name ?? '');
+  const [phoneNumber, setPhoneNumber] = useState<string>(user?.phone_number ?? '');
   const [location, setLocation] = useState(user?.location || '');
+  const [coordinates, setCoordinates] = useState<Coordinates | undefined>(
+    user?.coordinates ? JSON.parse(user.coordinates) : undefined
+  );
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | undefined>(undefined);
+  const [avatarUrl, setAvatarUrl] = useState<string | undefined>(user?.avatar_url ?? undefined);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -26,20 +55,62 @@ export default function EditProfilePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
+    setError(undefined);
+
+    const updateData = {
+      full_name: fullName,
+      phone_number: phoneNumber,
+      location: location,
+      coordinates: coordinates ? JSON.stringify(coordinates) : undefined,
+      avatar_url: avatarUrl ?? undefined,
+    };
+
+    console.log('Sending update data:', updateData);
 
     try {
-      await updateProfile({
-        full_name: fullName,
-        phone_number: phoneNumber,
-        location: location,
-      });
+      await updateUserProfile(updateData);
       router.push('/profile');
-    } catch (error: any) {
-      setError(error.message);
+    } catch (err) {
+      console.error('Error updating profile:', err);
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
     }
+  };
+
+  async function uploadAvatar(event: React.ChangeEvent<HTMLInputElement>) {
+    try {
+      setUploading(true);
+
+      if (!event.target.files || event.target.files.length === 0) {
+        throw new Error('You must select an image to upload.');
+      }
+
+      const file = event.target.files[0];
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${Math.random()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      setAvatarUrl(publicUrl);
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  const handleLocationSelect = (data: LocationData) => {
+    setCoordinates({ lat: data.lat, lng: data.lng });
+    setLocation(data.address);
   };
 
   return (
@@ -83,19 +154,17 @@ export default function EditProfilePage() {
                   </div>
                 </div>
 
-                <div>
-                  <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <div className="space-y-2">
+                  <label htmlFor="phone_number" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Phone Number
                   </label>
-                  <div className="mt-1">
-                    <input
-                      type="tel"
-                      id="phoneNumber"
-                      value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
-                      className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                    />
-                  </div>
+                  <PhoneNumberInput
+                    value={phoneNumber}
+                    onChange={setPhoneNumber}
+                    required
+                    error={error}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  />
                 </div>
 
                 <div>
@@ -109,8 +178,35 @@ export default function EditProfilePage() {
                       value={location}
                       onChange={(e) => setLocation(e.target.value)}
                       className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                      placeholder="Click on the map to select your location"
+                      readOnly
                     />
+                    <div className="mt-2">
+                      <LocationDetector
+                        onLocationSelect={handleLocationSelect}
+                        selectedLocation={location}
+                        mode="select"
+                      />
+                    </div>
                   </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Profile Picture</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={uploadAvatar}
+                    disabled={uploading}
+                    className="mt-1 block w-full"
+                  />
+                  {avatarUrl && (
+                    <img
+                      src={avatarUrl}
+                      alt="Avatar"
+                      className="mt-2 h-20 w-20 rounded-full object-cover"
+                    />
+                  )}
                 </div>
 
                 {error && (

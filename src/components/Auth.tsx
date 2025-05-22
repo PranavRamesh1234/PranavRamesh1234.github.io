@@ -33,7 +33,7 @@ export default function Auth() {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
+            emailRedirectTo: `${window.location.origin}/auth/confirm?next=/`,
             data: {
               full_name: '',
               location: '',
@@ -48,7 +48,7 @@ export default function Auth() {
         
         if (data.user) {
           console.log('User created:', data.user);
-          // Check if email confirmation is required
+          // Always redirect to profile completion for new sign-ups
           if (data.session) {
             console.log('Session exists, redirecting to profile completion');
             router.push('/profile/complete');
@@ -72,8 +72,24 @@ export default function Auth() {
         if (error) throw error;
         
         if (data.session) {
-          console.log('Session exists, redirecting to profile');
-          router.push('/profile');
+          console.log('Session exists, checking profile');
+          // Check if user has a profile
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', data.session.user.id)
+            .single();
+
+          if (profile) {
+            console.log('Profile exists, redirecting to home');
+            // Get the stored path or default to home
+            const redirectPath = localStorage.getItem('redirectPath') || '/';
+            localStorage.removeItem('redirectPath');
+            router.push(redirectPath);
+          } else {
+            console.log('No profile, redirecting to profile completion');
+            router.push('/profile/complete');
+          }
         }
       }
     } catch (err) {
@@ -89,7 +105,7 @@ export default function Auth() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(window.location.pathname)}`,
         },
       });
       if (error) throw error;

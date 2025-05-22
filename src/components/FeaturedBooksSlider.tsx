@@ -17,8 +17,11 @@ export default function FeaturedBooksSlider() {
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const data = await getBooks();
-        setBooks(data.slice(0, 10)); // Get latest 10 books
+        const params = new URLSearchParams();
+        const { data } = await getBooks(params);
+        if (data && Array.isArray(data)) {
+          setBooks(data.slice(0, 5));
+        }
       } catch (error) {
         console.error('Error fetching featured books:', error);
       } finally {
@@ -36,7 +39,7 @@ export default function FeaturedBooksSlider() {
     slidesToShow: 4,
     slidesToScroll: 1,
     autoplay: true,
-    autoplaySpeed: 3000,
+    autoplaySpeed: 2500,
     arrows: true,
     responsive: [
       {
@@ -78,12 +81,14 @@ export default function FeaturedBooksSlider() {
   }
 
   return (
+    <div className="relative">
+      <div className="overflow-visible">
     <Slider {...settings}>
       {books.map((book) => (
-        <div key={book.id} className="px-2">
+            <div key={book.id} className="px-2 pb-8">
           <motion.div
             whileHover={{ y: -5 }}
-            className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md rounded-lg shadow-lg p-4 h-full"
+                className="bg-[#1F2937]/30 backdrop-blur-sm rounded-lg shadow-lg p-4 h-full"
           >
             <Link href={`/books/${book.id}`}>
               <div className="aspect-[3/4] relative mb-4 overflow-hidden rounded-lg">
@@ -94,22 +99,22 @@ export default function FeaturedBooksSlider() {
                     className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                    <span className="text-gray-400 dark:text-gray-500">No image</span>
+                      <div className="w-full h-full bg-[#1F2937]/50 flex items-center justify-center">
+                        <span className="text-gray-400">No image</span>
                   </div>
                 )}
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
+                  <h3 className="text-lg font-semibold text-white mb-2 line-clamp-2">
                 {book.title}
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-300 mb-2 line-clamp-1">
+                  <p className="text-sm text-gray-300 mb-2 line-clamp-1">
                 {book.author}
               </p>
               <div className="flex justify-between items-center">
-                <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
-                  ${book.price.toFixed(2)}
+                    <span className="text-lg font-bold text-[#00ACB5]">
+                  {book.price_type === 'price-on-call' || book.price === null ? 'Price on Call' : `₹${book.price.toFixed(2)}`}
                 </span>
-                <span className="text-sm text-gray-500 dark:text-gray-400">
+                    <span className="text-sm text-gray-400">
                   {book.condition}
                 </span>
               </div>
@@ -118,5 +123,7 @@ export default function FeaturedBooksSlider() {
         </div>
       ))}
     </Slider>
+      </div>
+    </div>
   );
 } 

@@ -54,7 +54,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .single();
 
       if (error) throw error;
-      setUser(data as User);
+
+      // Convert null to undefined for coordinates
+      const userData = {
+        ...data,
+        coordinates: data.coordinates === null ? undefined : data.coordinates,
+      };
+
+      setUser(userData as User);
     } catch (error) {
       console.error('Error fetching user profile:', error);
       setUser(null);
@@ -76,26 +83,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: `${window.location.origin}/auth/confirm?next=/profile/complete`,
       },
     });
     if (error) throw error;
-
-    if (data.user) {
-      // Create initial profile
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert([
-          {
-            id: data.user.id,
-            email: data.user.email,
-            full_name: '',
-            phone_number: '',
-            location: '',
-          },
-        ]);
-      if (profileError) throw profileError;
-    }
   };
 
   const signOut = async () => {
@@ -106,14 +97,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const updateProfile = async (updates: Partial<User>) => {
     if (!user) throw new Error('No user logged in');
 
-    const { error } = await supabase
+    // Convert undefined to null for all fields
+    const dbUpdates = Object.fromEntries(
+      Object.entries(updates).map(([key, value]) => [key, value === undefined ? null : value])
+    );
+
+    console.log('Sending to Supabase:', {
+      updates: dbUpdates,
+      userId: user.id
+    });
+
+    const { data, error } = await supabase
       .from('profiles')
-      .update(updates)
-      .eq('id', user.id);
+      .update(dbUpdates)
+      .eq('id', user.id)
+      .select()
+      .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
+      throw error;
+    }
 
-    // Update local user state
+    console.log('Update successful:', data);
+
+    // Update local user state with the original updates
     setUser((prevUser) => {
       if (!prevUser) return null;
       return { ...prevUser, ...updates };

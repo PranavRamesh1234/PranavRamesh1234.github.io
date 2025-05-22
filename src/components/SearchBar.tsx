@@ -39,7 +39,7 @@ export default function SearchBar({ category, onSearch, initialQuery = '' }: Sea
           type="text"
           value={searchQuery}
           onChange={handleInputChange}
-          placeholder="Search books by title, author, or ISBN..."
+          placeholder="Search books by title, author, description, or tags..."
           className="w-full px-4 py-2 pl-10 text-gray-900 dark:text-white bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
         />
         <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />

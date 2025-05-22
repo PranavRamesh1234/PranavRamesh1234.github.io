@@ -3,6 +3,28 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
+import PhoneNumberInput from '@/components/PhoneNumberInput';
+import dynamic from 'next/dynamic';
+
+// Dynamically import LocationPicker to avoid SSR issues with Leaflet
+const LocationPicker = dynamic(
+  () => import('@/components/LocationPicker').then(mod => mod.default),
+  {
+    ssr: false,
+    loading: () => <div className="h-[400px] bg-gray-100 dark:bg-gray-800 animate-pulse rounded-lg" />
+  }
+);
+
+interface Coordinates {
+  lat: number;
+  lng: number;
+}
+
+interface LocationData {
+  lat: number;
+  lng: number;
+  address: string;
+}
 
 export default function CompleteProfilePage() {
   const { user, updateProfile } = useAuth();
@@ -10,6 +32,9 @@ export default function CompleteProfilePage() {
   const [fullName, setFullName] = useState(user?.full_name || '');
   const [phoneNumber, setPhoneNumber] = useState(user?.phone_number || '');
   const [location, setLocation] = useState(user?.location || '');
+  const [coordinates, setCoordinates] = useState<Coordinates | null>(
+    user?.coordinates ? JSON.parse(user.coordinates) : null
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -17,7 +42,7 @@ export default function CompleteProfilePage() {
     if (!user) {
       router.push('/auth');
     } else if (user.phone_number && user.location) {
-      router.push('/books');
+      router.push('/');
     }
   }, [user, router]);
 
@@ -31,8 +56,9 @@ export default function CompleteProfilePage() {
         full_name: fullName,
         phone_number: phoneNumber,
         location: location,
+        coordinates: coordinates ? JSON.stringify(coordinates) : null,
       });
-      router.push('/books');
+      router.push('/');
     } catch (error: any) {
       setError(error.message);
     } finally {
@@ -70,21 +96,17 @@ export default function CompleteProfilePage() {
               </div>
             </div>
 
-            <div>
-              <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <div className="space-y-2">
+              <label htmlFor="phone_number" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Phone Number
               </label>
-              <div className="mt-1">
-                <input
-                  type="tel"
-                  id="phoneNumber"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  required
-                  pattern="[0-9]{10}"
-                  className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                />
-              </div>
+              <PhoneNumberInput
+                value={phoneNumber}
+                onChange={setPhoneNumber}
+                required
+                error={error}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              />
             </div>
 
             <div>
@@ -99,7 +121,18 @@ export default function CompleteProfilePage() {
                   onChange={(e) => setLocation(e.target.value)}
                   required
                   className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                  placeholder="Click on the map to select your location"
+                  readOnly
                 />
+                <div className="mt-2">
+                  <LocationPicker
+                    onLocationSelect={(data: LocationData) => {
+                      setCoordinates({ lat: data.lat, lng: data.lng });
+                      setLocation(data.address);
+                    }}
+                    initialLocation={coordinates || undefined}
+                  />
+                </div>
               </div>
             </div>
 

@@ -5,15 +5,16 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import FeaturedBooksSlider from '@/components/FeaturedBooksSlider';
-
-const categories = [
-  { id: 'academic', name: 'Academic', icon: '📚' },
-  { id: 'fiction', name: 'Fiction', icon: '📖' },
-  { id: 'non-fiction', name: 'Non-Fiction', icon: '📗' },
-  { id: 'textbook', name: 'Textbooks', icon: '📕' },
-  { id: 'reference', name: 'Reference', icon: '📘' },
-  { id: 'other', name: 'Other', icon: '📓' },
-];
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, Autoplay } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import Image from 'next/image';
+import MeshGradientBackground from '@/components/MeshGradientBackground';
+import { categories } from '@/lib/constants';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -38,86 +39,122 @@ const itemVariants = {
   }
 };
 
+interface Book {
+  id: string;
+  title: string;
+  author: string | null;
+  images: string[];
+  price: number;
+  price_status: 'fixed' | 'price_on_call';
+  class_level: string;
+  board: string;
+  subject: string;
+  condition: string;
+  seller: {
+    id: string;
+    full_name: string | null;
+    email: string;
+    location: string | null;
+    created_at: string;
+    updated_at: string;
+  };
+}
+
 export default function HomePage() {
   const router = useRouter();
+  const { user } = useAuth();
+  const [featuredBooks, setFeaturedBooks] = useState<Book[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Removed fetchFeaturedBooks logic
+    const fetchFeaturedBooks = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('books')
+          .select('*, seller:profiles(*)')
+          .eq('status', 'available')
+          .order('created_at', { ascending: false })
+          .limit(10);
+
+        if (error) throw error;
+        setFeaturedBooks(data || []);
+      } catch (err) {
+        console.error('Error fetching featured books:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedBooks();
   }, []);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
-      {/* Hero Section */}
-      <section className="relative gradient-bg text-white">
-        <div className="absolute inset-0 bg-black opacity-20"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center"
-          >
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Buy and Sell Books
-              <br />
-              <span className="text-yellow-300">Made Simple</span>
+    <div className="min-h-screen bg-[#020617]">
+      <MeshGradientBackground>
+        <div className="relative">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="relative z-10 pb-8 sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32">
+              <main className="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
+                <div className="sm:text-center lg:text-left">
+                  <h1 className="text-4xl tracking-tight font-extrabold text-white sm:text-5xl md:text-6xl">
+                    <span className="block">Find Your Next</span>
+                    <span className="block text-[#00f2ff]">Book</span>
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-blue-100">
-              Connect with readers and sellers in your community
+                  <p className="mt-3 text-base text-gray-300 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
+                    Buy and sell books with ease. Connect with fellow readers and find the perfect book for your needs.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
+                  <div className="mt-6 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
+                    <div className="rounded-md shadow">
                 <Link
                   href="/books"
-                  className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-700 bg-white hover:bg-blue-50 transition-colors duration-200"
+                        className="w-full flex items-center justify-center px-8 py-4 border border-transparent text-base font-medium rounded-md text-white bg-[#3D00B8] hover:bg-[#2D0088] md:py-4 md:text-lg md:px-10 transition-colors duration-300"
                 >
                   Browse Books
                 </Link>
-              </motion.div>
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
+                    </div>
+                    <div className="mt-3 sm:mt-0 sm:ml-3">
                 <Link
-                  href="/sell"
-                  className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-500 hover:bg-blue-600 transition-colors duration-200"
+                        href="/requests"
+                        className="w-full flex items-center justify-center px-8 py-4 border border-transparent text-base font-medium rounded-md text-black bg-[#00ACB5] hover:bg-[#007b82] md:py-4 md:text-lg md:px-10 transition-all duration-300"
                 >
-                  Sell a Book
+                        View Requests
                 </Link>
-              </motion.div>
+                    </div>
+                  </div>
+                </div>
+              </main>
             </div>
-          </motion.div>
+          </div>
         </div>
-      </section>
+      </MeshGradientBackground>
 
       {/* Featured Books Section */}
-      <section className="py-16 bg-gray-50 dark:bg-gray-800">
+      <section className="pt-4 pb-8 bg-[#060013]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="text-3xl font-bold text-gray-900 dark:text-white mb-8"
+            className="text-4xl font-bold text-white mt-4 mb-4"
           >
             Featured Books
           </motion.h2>
+          <div className="scale-95 overflow-visible">
           <FeaturedBooksSlider />
+          </div>
         </div>
       </section>
 
       {/* Categories Section */}
-      <section className="py-16 bg-white dark:bg-gray-900">
+      <section className="py-12 bg-[#060013]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="text-3xl font-bold text-gray-900 dark:text-white mb-8"
+            className="text-3xl font-bold text-center mb-8 text-white"
           >
             Browse by Category
           </motion.h2>
@@ -126,63 +163,19 @@ export default function HomePage() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
           >
             {categories.map((category) => (
               <motion.div
-                key={category.id}
+                key={category.value}
                 variants={itemVariants}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ y: -5 }}
+                className="bg-[#1F2937]/30 backdrop-blur-sm rounded-lg shadow-md p-6 text-center cursor-pointer hover:shadow-lg transition-all duration-300 hover:bg-[#2D3748]/40"
+                onClick={() => router.push(`/books?category=${category.value}`)}
               >
-                <Link href={`/books?category=${category.id}`}>
-                  <div className="glass-card p-6 text-center hover:bg-blue-50/80 dark:hover:bg-blue-900/80 transition-colors duration-300">
-                    <div className="text-4xl mb-2">{category.icon}</div>
-                    <h3 className="text-lg font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">
-                      {category.name}
-                    </h3>
-                  </div>
-                </Link>
+                <h3 className="text-lg font-semibold text-white">{category.label}</h3>
               </motion.div>
             ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* How It Works Section */}
-      <section className="py-16 bg-gray-50 dark:bg-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="text-3xl font-bold text-gray-900 dark:text-white mb-12 text-center"
-          >
-            How It Works
-          </motion.h2>
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-8"
-          >
-            <motion.div variants={itemVariants} className="glass-card p-6 text-center">
-              <div className="text-4xl mb-4">📚</div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">List Your Books</h3>
-              <p className="text-gray-600 dark:text-gray-300">Create listings for books you want to sell with photos and details</p>
-            </motion.div>
-            <motion.div variants={itemVariants} className="glass-card p-6 text-center">
-              <div className="text-4xl mb-4">🔍</div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Find Books</h3>
-              <p className="text-gray-600 dark:text-gray-300">Browse through thousands of books from sellers in your area</p>
-            </motion.div>
-            <motion.div variants={itemVariants} className="glass-card p-6 text-center">
-              <div className="text-4xl mb-4">🤝</div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Connect & Trade</h3>
-              <p className="text-gray-600 dark:text-gray-300">Connect with sellers and arrange to buy or sell books</p>
-            </motion.div>
           </motion.div>
         </div>
       </section>

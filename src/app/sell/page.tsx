@@ -1,29 +1,17 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import BookUploadForm from '@/components/BookUploadForm';
 
 export default function SellPage() {
   const router = useRouter();
 
-  useEffect(() => {
-    // Removed redirect logic
-  }, []);
-
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center">
-          <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-            List Your Book
-          </h1>
-          <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
-            Fill out the form below to list your book for sale.
-          </p>
-        </div>
+    <div className="min-h-screen bg-[#020617]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h1 className="text-3xl font-bold text-white mb-8">List Your Book</h1>
 
-        <div className="mt-12">
+        <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 shadow-2xl hover:border-[#00f2ff]/40 transition-all duration-300">
           <BookUploadForm />
         </div>
       </div>

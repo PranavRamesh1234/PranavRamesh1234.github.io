@@ -1,0 +1,80 @@
+:root {
+  /* Primary Colors */
+  --color-primary: #3B82F6;      /* Blue */
+  --color-primary-dark: #2563EB; /* Darker Blue */
+  --color-primary-light: #60A5FA; /* Lighter Blue */
+
+  /* Background Colors */
+  --color-bg-primary: #FFFFFF;   /* White */
+  --color-bg-secondary: #F3F4F6; /* Light Gray */
+  --color-bg-tertiary: #E5E7EB;  /* Medium Gray */
+  --color-bg-overlay: rgba(0, 0, 0, 0.5);
+
+  /* Text Colors */
+  --color-text-primary: #111827;   /* Dark Gray */
+  --color-text-secondary: #4B5563; /* Medium Gray */
+  --color-text-muted: #6B7280;     /* Light Gray */
+  --color-text-white: #FFFFFF;     /* White */
+
+  /* Border Colors */
+  --color-border: #E5E7EB;      /* Light Gray */
+  --color-border-dark: #D1D5DB; /* Medium Gray */
+
+  /* Status Colors */
+  --color-success: #10B981;     /* Green */
+  --color-warning: #F59E0B;     /* Orange */
+  --color-error: #EF4444;       /* Red */
+  --color-info: #3B82F6;        /* Blue */
+
+  /* Accent Colors */
+  --color-accent-1: #8B5CF6;    /* Purple */
+  --color-accent-2: #EC4899;    /* Pink */
+  --color-accent-3: #14B8A6;    /* Teal */
+
+  /* Shadow Colors */
+  --color-shadow: rgba(0, 0, 0, 0.1);
+  --color-shadow-dark: rgba(0, 0, 0, 0.2);
+
+  /* Glass Effect */
+  --color-glass-bg: rgba(255, 255, 255, 0.8);
+  --color-glass-border: rgba(255, 255, 255, 0.2);
+  --color-glass-shadow: rgba(0, 0, 0, 0.1);
+}
+
+/* Utility Classes */
+.bg-primary { background-color: var(--color-primary); }
+.bg-secondary { background-color: var(--color-bg-secondary); }
+.bg-tertiary { background-color: var(--color-bg-tertiary); }
+
+.text-primary { color: var(--color-text-primary); }
+.text-secondary { color: var(--color-text-secondary); }
+.text-muted { color: var(--color-text-muted); }
+.text-white { color: var(--color-text-white); }
+
+.border-primary { border-color: var(--color-border); }
+.border-secondary { border-color: var(--color-border-dark); }
+
+/* Glass Effect */
+.glass {
+  background: var(--color-glass-bg);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--color-glass-border);
+  box-shadow: 0 4px 6px var(--color-glass-shadow);
+}
+
+/* Status Badges */
+.badge-success { background-color: var(--color-success); color: var(--color-text-white); }
+.badge-warning { background-color: var(--color-warning); color: var(--color-text-white); }
+.badge-error { background-color: var(--color-error); color: var(--color-text-white); }
+.badge-info { background-color: var(--color-info); color: var(--color-text-white); }
+
+/* Hover States */
+.hover-primary:hover { background-color: var(--color-primary-dark); }
+.hover-secondary:hover { background-color: var(--color-bg-tertiary); }
+
+/* Transitions */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+} 

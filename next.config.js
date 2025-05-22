@@ -3,7 +3,7 @@ const nextConfig = {
   images: {
     domains: ['apbgdwgiqrzarwnicguu.supabase.co'],
   },
-  distDir: 'dist',
+  distDir: '.next',
   eslint: {
     ignoreDuringBuilds: true,
   },
