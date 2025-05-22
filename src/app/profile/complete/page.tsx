@@ -56,7 +56,7 @@ export default function CompleteProfilePage() {
         full_name: fullName,
         phone_number: phoneNumber,
         location: location,
-        coordinates: coordinates ? JSON.stringify(coordinates) : null,
+        coordinates: coordinates ? JSON.stringify(coordinates) : undefined,
       });
       router.push('/');
     } catch (error: any) {
