@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { getRequests } from '@/lib/supabase-utils';
 import { Request } from '@/types';
@@ -10,7 +10,7 @@ import Pagination from '@/components/Pagination';
 
 const ITEMS_PER_PAGE = 12;
 
-export default function RequestsPage() {
+function RequestsPageInner() {
   const searchParams = useSearchParams();
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
@@ -122,6 +122,7 @@ export default function RequestsPage() {
               <h2 className="text-lg font-semibold text-white mb-4">Filters</h2>
               <SearchFilters
                 onFilterChange={handleFilterChange}
+                onSortChange={() => {}}
                 initialFilters={{
                   category: selectedCategory || '',
                   board: selectedBoard || '',
@@ -177,5 +178,13 @@ export default function RequestsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RequestsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gray-500">Loading requests...</div>}>
+      <RequestsPageInner />
+    </Suspense>
   );
 } 

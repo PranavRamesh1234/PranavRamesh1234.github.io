@@ -70,7 +70,7 @@ export default function SearchFilters({
 
   const hasActiveFilters = Object.values(filters).some(value => value !== '' && value !== null);
 
-  return (
+    return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-medium text-white">Filters</h3>
@@ -162,7 +162,7 @@ export default function SearchFilters({
             <option value="fair">Fair</option>
             <option value="poor">Poor</option>
           </select>
-        </div>
+          </div>
 
         {/* Price Range */}
         <div className="space-y-2">
@@ -178,13 +178,13 @@ export default function SearchFilters({
               />
             </div>
             <div>
-              <input
-                type="number"
-                placeholder="Max"
-                value={filters.maxPrice}
-                onChange={(e) => handlePriceChange('max', e.target.value)}
+          <input
+            type="number"
+            placeholder="Max"
+            value={filters.maxPrice}
+            onChange={(e) => handlePriceChange('max', e.target.value)}
                 className="w-full px-3 py-2 bg-[#1E293B] border border-white/20 rounded-md text-white focus:ring-2 focus:ring-[#00f2ff] focus:border-[#00f2ff]"
-              />
+          />
             </div>
           </div>
         </div>
